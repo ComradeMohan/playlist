@@ -1,25 +1,27 @@
-from fastapi import FastAPI, Form
-from fastapi.middleware.cors import CORSMiddleware
-import yt_dlp
 
+from fastapi import FastAPI, Form
+from pydantic import BaseModel
+import yt_dlp
+import os
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allows all origins, but you can specify specific ones
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app = FastAPI()
+
 def download_playlist(playlist_url: str):
     ydl_opts = {
         'format': 'best',
-        'outtmpl': '%(playlist)s/%(title)s.%(ext)s',
+        'outtmpl': '%(playlist)s/%(title)s.%(ext)s',  # Save files in a folder named after the playlist
         'noplaylist': False,
-        'headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-        }
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -33,7 +35,13 @@ async def download(playlist_url: str = Form(...)):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/")
+# Start the server with: uvicorn main:app --reload
+@app.get("/", response_class=HTMLResponse)
 async def serve_html():
     with open("index.html", "r") as file:
-        return file.read()
+        html_content = file.read()
+    return html_content
+
+
+
+
