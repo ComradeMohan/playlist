@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Playlist Downloader</title>
+</head>
+<body>
+    <h1>YouTube Playlist Downloader</h1>
+    <form id="download-form">
+        <label for="playlist-url">Playlist URL:</label>
+        <input type="text" id="playlist-url" name="playlist-url" required>
+        
+        <label for="cookies-file">Cookies File (optional):</label>
+        <input type="file" id="cookies-file" name="cookies-file">
+        
+        <button type="submit">Download Playlist</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('download-form').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const responseDiv = document.getElementById('response');
+
+            const response = await fetch('/download/', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+            responseDiv.innerText = result.message;
+        };
+    </script>
+</body>
+</html>
